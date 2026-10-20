@@ -1,0 +1,6 @@
+{
+  "name": "Department Cup: Darts & Foosball",
+  "description": "Tournament management system for the University Chemistry Department Cup featuring Foosball (Kicker) and Darts with live standings, match fixtures, and auto-seeded knockout brackets.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
