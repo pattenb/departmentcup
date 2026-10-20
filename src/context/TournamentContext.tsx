@@ -152,7 +152,12 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     try {
       const saved = localStorage.getItem(`${STORAGE_KEY}_darts`);
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Auto-upgrade if saved state contains old placeholder names
+        if (parsed.teams && parsed.teams.some((t: any) => t.name === 'Tungsten Trebles')) {
+          return createInitialDartsState();
+        }
+        return parsed;
       }
     } catch (e) {
       console.warn('Failed to parse saved darts tournament state:', e);
@@ -197,6 +202,15 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data.teams && data.groupMatches && data.knockoutMatches) {
+            let teams = data.teams;
+
+            // Auto-upgrade if Firestore still has legacy placeholder team
+            if (teams.some((t: any) => t.name === 'Tungsten Trebles')) {
+              const init = createInitialDartsState();
+              saveDartsStateToFirestore(init);
+              return;
+            }
+
             const remoteState: SportTournamentState = {
               teams: data.teams,
               groupMatches: data.groupMatches,

@@ -35,14 +35,12 @@ export const DEFAULT_DARTS_TEAMS: Team[] = [
   { id: 'd_g1_5', name: 'Tom Cardoen', player1: 'Tom Cardoen', email: 'tom.cardoen@ugent.be', pouleId: 'G1', seed: 5 },
   { id: 'd_g1_6', name: 'Ilyas Maulana Yahya', player1: 'Ilyas Maulana Yahya', email: 'ilyasmaulana.yahya@ugent.be', pouleId: 'G1', seed: 6 },
 
-  // Group B (Group 2 - 7 players)
-  { id: 'd_g2_1', name: 'Tungsten Trebles', lab: 'Advanced Materials & Nanotechnology', pouleId: 'G2', seed: 1 },
-  { id: 'd_g2_2', name: 'Argon Arrows', lab: 'Atmospheric & Environmental Chemistry', pouleId: 'G2', seed: 2 },
-  { id: 'd_g2_3', name: 'Centrifuge Snipers', lab: 'Structural & Computational Chemistry', pouleId: 'G2', seed: 3 },
-  { id: 'd_g2_4', name: 'Enthalpy Eagles', lab: 'Thermal Analysis & Calorimetry', pouleId: 'G2', seed: 4 },
-  { id: 'd_g2_5', name: 'Chromatograph Champs', lab: 'HPLC / GC-MS Separations Lab', pouleId: 'G2', seed: 5 },
-  { id: 'd_g2_6', name: 'Isotope Marksmen', lab: 'Inorganic & Radiochemistry', pouleId: 'G2', seed: 6 },
-  { id: 'd_g2_7', name: 'Crystallography Crew', lab: 'Single Crystal X-Ray Diffraction', pouleId: 'G2', seed: 7 },
+  // Group B (Group 2 - 5 players)
+  { id: 'd_g2_1', name: 'Patman', player1: 'Patman', email: 'Pat.borra@ugent.be', pouleId: 'G2', seed: 1 },
+  { id: 'd_g2_2', name: 'Thibaut Baert', player1: 'Thibaut Baert', email: 'thibaut.baert@ugent.be', pouleId: 'G2', seed: 2 },
+  { id: 'd_g2_3', name: 'Luca Zanotto', player1: 'Luca Zanotto', email: 'luca.zanotto@ugent.be', pouleId: 'G2', seed: 3 },
+  { id: 'd_g2_4', name: 'Tijs Vandenneucker', player1: 'Tijs Vandenneucker', email: 'Tijs.vandenneucker@UGent.be', pouleId: 'G2', seed: 4 },
+  { id: 'd_g2_5', name: 'Jasper Herthogs', player1: 'Jasper Herthogs', email: 'jasper.herthogs@ugent.be', pouleId: 'G2', seed: 5 },
 ];
 
 /**

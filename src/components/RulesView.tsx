@@ -106,10 +106,10 @@ export const RulesView: React.FC = () => {
 
             <div>
               <span className="font-bold text-slate-900 block mb-0.5">Format &amp; Groups:</span>
-              13 teams/players divided into 2 groups:
+              11 teams/players divided into 2 groups:
               <ul className="list-disc pl-4 space-y-1 mt-1">
-                <li><strong className="text-[#1E64C8]">Group 1:</strong> 6 teams/players (15 matches)</li>
-                <li><strong className="text-[#1E64C8]">Group 2:</strong> 7 teams/players (21 matches, 1 bye per round)</li>
+                <li><strong className="text-[#1E64C8]">Group 1 (Group A):</strong> 6 teams/players (15 matches)</li>
+                <li><strong className="text-[#1E64C8]">Group 2 (Group B):</strong> 5 teams/players (10 matches, 1 bye per round)</li>
               </ul>
             </div>
 

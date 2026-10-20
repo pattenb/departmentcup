@@ -47,7 +47,7 @@ export const AdminLoginModal: React.FC = () => {
         </div>
 
         {/* Content Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} autoComplete="off" className="p-6 space-y-4">
           {loginPromptMessage && (
             <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 flex items-start gap-2.5 text-xs text-amber-900">
               <KeyRound className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
@@ -66,7 +66,8 @@ export const AdminLoginModal: React.FC = () => {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="admincup"
+                placeholder="Enter username"
+                autoComplete="off"
                 className="w-full bg-slate-50 border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1E64C8] focus:bg-white focus:ring-1 focus:ring-[#1E64C8]"
                 autoFocus
               />
@@ -84,7 +85,8 @@ export const AdminLoginModal: React.FC = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
+                placeholder="Enter password"
+                autoComplete="current-password"
                 className="w-full bg-slate-50 border border-slate-300 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1E64C8] focus:bg-white focus:ring-1 focus:ring-[#1E64C8]"
               />
             </div>

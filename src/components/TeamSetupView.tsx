@@ -94,7 +94,7 @@ export const TeamSetupView: React.FC = () => {
                 : 'text-slate-700 hover:text-slate-900'
             }`}
           >
-            Department Cup Darts (13 Teams)
+            Department Cup Darts (11 Players)
           </button>
         </div>
       </div>
@@ -125,7 +125,7 @@ export const TeamSetupView: React.FC = () => {
               ? `Group ${pouleId} (6 Teams)`
               : pouleId === 'G1'
               ? 'Group A (6 Players)'
-              : 'Group B (7 Players)';
+              : 'Group B (5 Players)';
 
           return (
             <div
