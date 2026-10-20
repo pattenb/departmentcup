@@ -155,22 +155,39 @@ export const Header: React.FC = () => {
 
           {/* Zone 3: Primary action & utilities */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Admin Badge */}
-            {isAdmin && (
-              <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-200 rounded-md px-2.5 py-1 text-xs">
-                <ShieldCheck className="w-4 h-4 text-[#1E64C8]" />
-                <span className="font-bold text-[#1E64C8] hidden sm:inline">Admin Mode</span>
+            {/* Single Admin Button / Badge */}
+            {isAdmin ? (
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={logout}
-                  title="Log out from Admin"
-                  className="ml-1 text-slate-500 hover:text-rose-600 p-1 rounded transition-colors cursor-pointer"
+                  onClick={handleOpenReset}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-50 px-2.5 py-1.5 rounded-md border border-amber-200 transition-colors cursor-pointer"
+                  title="Reset tournament scores or data"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                  <span className="hidden sm:inline">Reset Scores</span>
                 </button>
+                <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-200 rounded-md px-2.5 py-1 text-xs">
+                  <ShieldCheck className="w-4 h-4 text-[#1E64C8]" />
+                  <span className="font-bold text-[#1E64C8] hidden sm:inline">Admin Mode</span>
+                  <button
+                    onClick={logout}
+                    title="Log out from Admin"
+                    className="ml-1 text-slate-500 hover:text-rose-600 p-1 rounded transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
+            ) : (
+              <button
+                onClick={() => openLoginModal()}
+                className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-[#1E64C8] hover:bg-slate-100 px-3 py-1.5 rounded-md border border-slate-200 transition-colors cursor-pointer"
+                title="Admin Login"
+              >
+                <Lock className="w-3.5 h-3.5 text-slate-500" />
+                <span>Admin Login</span>
+              </button>
             )}
-
-
 
             <button
               onClick={handlePrint}
@@ -227,7 +244,7 @@ export const Header: React.FC = () => {
               activeView === 'teams' ? 'bg-[#1E64C8] text-white' : 'text-slate-700 hover:bg-slate-200'
             }`}
           >
-            Labs
+            Teams
           </button>
           <button
             onClick={() => setActiveView('rules')}

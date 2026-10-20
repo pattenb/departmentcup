@@ -35,7 +35,7 @@ const TournamentAppContent: React.FC = () => {
             <span className="font-semibold text-slate-700">Department of Chemistry</span>
           </div>
           <span className="font-mono text-slate-400">
-            Foosball &amp; Darts Department Cup 2026 · Auto-saved to local storage
+            Foosball &amp; Darts Department Cup 2026
           </span>
         </div>
       </footer>
