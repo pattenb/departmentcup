@@ -1,0 +1,34 @@
+{
+  "entities": {
+    "TournamentState": {
+      "title": "Tournament State",
+      "description": "Tournament data including teams, group matches, and knockout matches",
+      "type": "object",
+      "properties": {
+        "teams": {
+          "type": "array",
+          "description": "List of teams"
+        },
+        "groupMatches": {
+          "type": "array",
+          "description": "List of group matches"
+        },
+        "knockoutMatches": {
+          "type": "array",
+          "description": "List of knockout matches"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp of last update"
+        }
+      },
+      "required": ["teams", "groupMatches", "knockoutMatches"]
+    }
+  },
+  "firestore": {
+    "/tournaments/{sportId}": {
+      "schema": "TournamentState",
+      "description": "Tournament state documents for foosball and darts"
+    }
+  }
+}

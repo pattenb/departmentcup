@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { db, handleFirestoreError, OperationType } from '../utils/firebase';
 import {
   SportType,
   Team,
@@ -112,6 +114,24 @@ function createInitialDartsState(): SportTournamentState {
   return { teams, groupMatches, knockoutMatches };
 }
 
+const saveFoosballStateToFirestore = (state: SportTournamentState) => {
+  setDoc(doc(db, 'tournaments', 'foosball'), {
+    teams: state.teams,
+    groupMatches: state.groupMatches,
+    knockoutMatches: state.knockoutMatches,
+    updatedAt: new Date().toISOString(),
+  }).catch((err) => handleFirestoreError(err, OperationType.WRITE, 'tournaments/foosball'));
+};
+
+const saveDartsStateToFirestore = (state: SportTournamentState) => {
+  setDoc(doc(db, 'tournaments', 'darts'), {
+    teams: state.teams,
+    groupMatches: state.groupMatches,
+    knockoutMatches: state.knockoutMatches,
+    updatedAt: new Date().toISOString(),
+  }).catch((err) => handleFirestoreError(err, OperationType.WRITE, 'tournaments/darts'));
+};
+
 export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activeSport, setActiveSport] = useState<SportType>('foosball');
   const [activeView, setActiveView] = useState<'groups' | 'knockout' | 'teams' | 'rules'>('groups');
@@ -140,7 +160,73 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return createInitialDartsState();
   });
 
-  // Save to localStorage whenever state changes
+  // Real-time listener for Firestore documents
+  useEffect(() => {
+    const unsubFoosball = onSnapshot(
+      doc(db, 'tournaments', 'foosball'),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.teams && data.groupMatches && data.knockoutMatches) {
+            const remoteState: SportTournamentState = {
+              teams: data.teams,
+              groupMatches: data.groupMatches,
+              knockoutMatches: data.knockoutMatches,
+            };
+            setFoosballState((prev) => {
+              if (JSON.stringify(prev) !== JSON.stringify(remoteState)) {
+                return remoteState;
+              }
+              return prev;
+            });
+          }
+        } else {
+          // Initialize doc if not exists
+          const init = createInitialFoosballState();
+          saveFoosballStateToFirestore(init);
+        }
+      },
+      (error) => {
+        handleFirestoreError(error, OperationType.GET, 'tournaments/foosball');
+      }
+    );
+
+    const unsubDarts = onSnapshot(
+      doc(db, 'tournaments', 'darts'),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.teams && data.groupMatches && data.knockoutMatches) {
+            const remoteState: SportTournamentState = {
+              teams: data.teams,
+              groupMatches: data.groupMatches,
+              knockoutMatches: data.knockoutMatches,
+            };
+            setDartsState((prev) => {
+              if (JSON.stringify(prev) !== JSON.stringify(remoteState)) {
+                return remoteState;
+              }
+              return prev;
+            });
+          }
+        } else {
+          // Initialize doc if not exists
+          const init = createInitialDartsState();
+          saveDartsStateToFirestore(init);
+        }
+      },
+      (error) => {
+        handleFirestoreError(error, OperationType.GET, 'tournaments/darts');
+      }
+    );
+
+    return () => {
+      unsubFoosball();
+      unsubDarts();
+    };
+  }, []);
+
+  // Cache to localStorage whenever state changes
   useEffect(() => {
     try {
       localStorage.setItem(`${STORAGE_KEY}_foosball`, JSON.stringify(foosballState));
@@ -193,9 +279,10 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         foosballStandingsC,
         foosballBestThird.qualifiedThirds
       );
-      // Only update if changed
       if (JSON.stringify(updatedKnockout) !== JSON.stringify(prev.knockoutMatches)) {
-        return { ...prev, knockoutMatches: updatedKnockout };
+        const nextState = { ...prev, knockoutMatches: updatedKnockout };
+        saveFoosballStateToFirestore(nextState);
+        return nextState;
       }
       return prev;
     });
@@ -209,7 +296,9 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         dartsStandingsG2
       );
       if (JSON.stringify(updatedKnockout) !== JSON.stringify(prev.knockoutMatches)) {
-        return { ...prev, knockoutMatches: updatedKnockout };
+        const nextState = { ...prev, knockoutMatches: updatedKnockout };
+        saveDartsStateToFirestore(nextState);
+        return nextState;
       }
       return prev;
     });
@@ -230,33 +319,41 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const isCompleted = homeScore !== null && awayScore !== null;
 
       if (sport === 'foosball') {
-        setFoosballState((prev) => ({
-          ...prev,
-          groupMatches: prev.groupMatches.map((m) =>
-            m.id === matchId
-              ? {
-                  ...m,
-                  homeScore,
-                  awayScore,
-                  completed: isCompleted,
-                }
-              : m
-          ),
-        }));
+        setFoosballState((prev) => {
+          const nextState = {
+            ...prev,
+            groupMatches: prev.groupMatches.map((m) =>
+              m.id === matchId
+                ? {
+                    ...m,
+                    homeScore,
+                    awayScore,
+                    completed: isCompleted,
+                  }
+                : m
+            ),
+          };
+          saveFoosballStateToFirestore(nextState);
+          return nextState;
+        });
       } else {
-        setDartsState((prev) => ({
-          ...prev,
-          groupMatches: prev.groupMatches.map((m) =>
-            m.id === matchId
-              ? {
-                  ...m,
-                  homeScore,
-                  awayScore,
-                  completed: isCompleted,
-                }
-              : m
-          ),
-        }));
+        setDartsState((prev) => {
+          const nextState = {
+            ...prev,
+            groupMatches: prev.groupMatches.map((m) =>
+              m.id === matchId
+                ? {
+                    ...m,
+                    homeScore,
+                    awayScore,
+                    completed: isCompleted,
+                  }
+                : m
+            ),
+          };
+          saveDartsStateToFirestore(nextState);
+          return nextState;
+        });
       }
 
       return { success: true };
@@ -266,23 +363,31 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const clearGroupScore = useCallback((sport: SportType, matchId: string) => {
     if (sport === 'foosball') {
-      setFoosballState((prev) => ({
-        ...prev,
-        groupMatches: prev.groupMatches.map((m) =>
-          m.id === matchId
-            ? { ...m, homeScore: null, awayScore: null, completed: false }
-            : m
-        ),
-      }));
+      setFoosballState((prev) => {
+        const nextState = {
+          ...prev,
+          groupMatches: prev.groupMatches.map((m) =>
+            m.id === matchId
+              ? { ...m, homeScore: null, awayScore: null, completed: false }
+              : m
+          ),
+        };
+        saveFoosballStateToFirestore(nextState);
+        return nextState;
+      });
     } else {
-      setDartsState((prev) => ({
-        ...prev,
-        groupMatches: prev.groupMatches.map((m) =>
-          m.id === matchId
-            ? { ...m, homeScore: null, awayScore: null, completed: false }
-            : m
-        ),
-      }));
+      setDartsState((prev) => {
+        const nextState = {
+          ...prev,
+          groupMatches: prev.groupMatches.map((m) =>
+            m.id === matchId
+              ? { ...m, homeScore: null, awayScore: null, completed: false }
+              : m
+          ),
+        };
+        saveDartsStateToFirestore(nextState);
+        return nextState;
+      });
     }
   }, []);
 
@@ -312,8 +417,7 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
               : m
           );
 
-          // Re-sync winners
-          return {
+          const nextState = {
             ...prev,
             knockoutMatches: syncFoosballKnockout(
               updatedMatches,
@@ -323,6 +427,8 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
               foosballBestThird.qualifiedThirds
             ),
           };
+          saveFoosballStateToFirestore(nextState);
+          return nextState;
         });
       } else {
         setDartsState((prev) => {
@@ -337,7 +443,7 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
               : m
           );
 
-          return {
+          const nextState = {
             ...prev,
             knockoutMatches: syncDartsKnockout(
               updatedMatches,
@@ -345,6 +451,8 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
               dartsStandingsG2
             ),
           };
+          saveDartsStateToFirestore(nextState);
+          return nextState;
         });
       }
 
@@ -362,7 +470,7 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
               ? { ...m, homeScore: null, awayScore: null, completed: false, winnerId: null, loserId: null }
               : m
           );
-          return {
+          const nextState = {
             ...prev,
             knockoutMatches: syncFoosballKnockout(
               updatedMatches,
@@ -372,6 +480,8 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
               foosballBestThird.qualifiedThirds
             ),
           };
+          saveFoosballStateToFirestore(nextState);
+          return nextState;
         });
       } else {
         setDartsState((prev) => {
@@ -380,7 +490,7 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
               ? { ...m, homeScore: null, awayScore: null, completed: false, winnerId: null, loserId: null }
               : m
           );
-          return {
+          const nextState = {
             ...prev,
             knockoutMatches: syncDartsKnockout(
               updatedMatches,
@@ -388,6 +498,8 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
               dartsStandingsG2
             ),
           };
+          saveDartsStateToFirestore(nextState);
+          return nextState;
         });
       }
     },
@@ -420,15 +532,23 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           : t;
 
       if (sport === 'foosball') {
-        setFoosballState((prev) => ({
-          ...prev,
-          teams: prev.teams.map(updateFn),
-        }));
+        setFoosballState((prev) => {
+          const nextState = {
+            ...prev,
+            teams: prev.teams.map(updateFn),
+          };
+          saveFoosballStateToFirestore(nextState);
+          return nextState;
+        });
       } else {
-        setDartsState((prev) => ({
-          ...prev,
-          teams: prev.teams.map(updateFn),
-        }));
+        setDartsState((prev) => {
+          const nextState = {
+            ...prev,
+            teams: prev.teams.map(updateFn),
+          };
+          saveDartsStateToFirestore(nextState);
+          return nextState;
+        });
       }
     },
     []
@@ -444,7 +564,9 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           prev.teams,
           prev.knockoutMatches
         );
-        return { ...prev, groupMatches, knockoutMatches };
+        const nextState = { ...prev, groupMatches, knockoutMatches };
+        saveFoosballStateToFirestore(nextState);
+        return nextState;
       });
     }
     if (targetSport === 'darts' || !sport) {
@@ -455,7 +577,9 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           prev.teams,
           prev.knockoutMatches
         );
-        return { ...prev, groupMatches, knockoutMatches };
+        const nextState = { ...prev, groupMatches, knockoutMatches };
+        saveDartsStateToFirestore(nextState);
+        return nextState;
       });
     }
   }, [activeSport]);
@@ -463,36 +587,48 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const resetScores = useCallback((sport?: SportType) => {
     const targetSport = sport || activeSport;
     if (targetSport === 'foosball' || !sport) {
-      setFoosballState((prev) => ({
-        ...prev,
-        groupMatches: prev.groupMatches.map((m) => ({
-          ...m,
-          homeScore: null,
-          awayScore: null,
-          completed: false,
-        })),
-        knockoutMatches: createInitialKnockoutMatches('foosball'),
-      }));
+      setFoosballState((prev) => {
+        const nextState = {
+          ...prev,
+          groupMatches: prev.groupMatches.map((m) => ({
+            ...m,
+            homeScore: null,
+            awayScore: null,
+            completed: false,
+          })),
+          knockoutMatches: createInitialKnockoutMatches('foosball'),
+        };
+        saveFoosballStateToFirestore(nextState);
+        return nextState;
+      });
     }
     if (targetSport === 'darts' || !sport) {
-      setDartsState((prev) => ({
-        ...prev,
-        groupMatches: prev.groupMatches.map((m) => ({
-          ...m,
-          homeScore: null,
-          awayScore: null,
-          completed: false,
-        })),
-        knockoutMatches: createInitialKnockoutMatches('darts'),
-      }));
+      setDartsState((prev) => {
+        const nextState = {
+          ...prev,
+          groupMatches: prev.groupMatches.map((m) => ({
+            ...m,
+            homeScore: null,
+            awayScore: null,
+            completed: false,
+          })),
+          knockoutMatches: createInitialKnockoutMatches('darts'),
+        };
+        saveDartsStateToFirestore(nextState);
+        return nextState;
+      });
     }
   }, [activeSport]);
 
   const resetToDefault = useCallback(() => {
     localStorage.removeItem(`${STORAGE_KEY}_foosball`);
     localStorage.removeItem(`${STORAGE_KEY}_darts`);
-    setFoosballState(createInitialFoosballState());
-    setDartsState(createInitialDartsState());
+    const initFoosball = createInitialFoosballState();
+    const initDarts = createInitialDartsState();
+    setFoosballState(initFoosball);
+    setDartsState(initDarts);
+    saveFoosballStateToFirestore(initFoosball);
+    saveDartsStateToFirestore(initDarts);
   }, []);
 
   const exportData = useCallback(() => {
@@ -518,6 +654,8 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       if (parsed.foosball && parsed.darts) {
         setFoosballState(parsed.foosball);
         setDartsState(parsed.darts);
+        saveFoosballStateToFirestore(parsed.foosball);
+        saveDartsStateToFirestore(parsed.darts);
         return { success: true };
       }
       return { success: false, error: 'Invalid backup file format.' };
