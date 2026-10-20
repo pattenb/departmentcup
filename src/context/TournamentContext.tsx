@@ -140,7 +140,13 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     try {
       const saved = localStorage.getItem(`${STORAGE_KEY}_foosball`);
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (parsed.teams) {
+          parsed.teams = parsed.teams.map((t: Team) =>
+            t.id === 'f_c3' && t.name === 'Dark Polo Gent' ? { ...t, name: 'Dark Polo Gent 777' } : t
+          );
+        }
+        return parsed;
       }
     } catch (e) {
       console.warn('Failed to parse saved foosball tournament state:', e);
@@ -173,13 +179,19 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data.teams && data.groupMatches && data.knockoutMatches) {
+            const teams = data.teams.map((t: Team) =>
+              t.id === 'f_c3' && t.name === 'Dark Polo Gent' ? { ...t, name: 'Dark Polo Gent 777' } : t
+            );
             const remoteState: SportTournamentState = {
-              teams: data.teams,
+              teams,
               groupMatches: data.groupMatches,
               knockoutMatches: data.knockoutMatches,
             };
             setFoosballState((prev) => {
               if (JSON.stringify(prev) !== JSON.stringify(remoteState)) {
+                if (data.teams.some((t: any) => t.id === 'f_c3' && t.name === 'Dark Polo Gent')) {
+                  saveFoosballStateToFirestore(remoteState);
+                }
                 return remoteState;
               }
               return prev;

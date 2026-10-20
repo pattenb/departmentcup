@@ -20,7 +20,7 @@ export const DEFAULT_FOOSBALL_TEAMS: Team[] = [
   // Group C (6 teams)
   { id: 'f_c1', name: 'Jing & Zofia', player1: 'Jing Bai', player2: 'Zofia', email: 'zofia.petryna@ugent.be', pouleId: 'C', seed: 1 },
   { id: 'f_c2', name: 'Pure Class, Naturally', player1: 'Wiebe Volckaert', player2: 'Luca Giordano', email: 'wiebe.volckaert@ugent.be', pouleId: 'C', seed: 2 },
-  { id: 'f_c3', name: 'Dark Polo Gent', player1: 'Tommaso Ruggiero', player2: 'Gianluca Carì', email: 'tommaso.ruggiero@ugent.be', pouleId: 'C', seed: 3 },
+  { id: 'f_c3', name: 'Dark Polo Gent 777', player1: 'Tommaso Ruggiero', player2: 'Gianluca Carì', email: 'tommaso.ruggiero@ugent.be', pouleId: 'C', seed: 3 },
   { id: 'f_c4', name: 'The balding boys', player1: 'Kobe Scherpereel', player2: 'Tijs Vandenneucker', email: 'kobe.scherpereel@ugent.be', pouleId: 'C', seed: 4 },
   { id: 'f_c5', name: 'Bend it like Frank', player1: 'Mathias Vandermeiren', player2: 'Teun Vandenhaute', email: 'mathias.vandermeiren@ugent.be', pouleId: 'C', seed: 5 },
   { id: 'f_c6', name: 'Mean Girls', player1: 'Óscar', player2: 'Eline', email: 'Oscar.AldazTrenc@ugent.be', pouleId: 'C', seed: 6 },
