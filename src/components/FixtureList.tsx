@@ -165,7 +165,7 @@ export const FixtureList: React.FC<FixtureListProps> = ({ sport, matches, pouleO
           <div className="flex items-center gap-2.5 text-slate-700">
             <Lock className="w-4 h-4 text-[#1E64C8] shrink-0" />
             <span>
-              <strong>Public View:</strong> Matches &amp; results are read-only. Log in as organizer admin (<strong>admincup</strong>) to enter or update scores.
+              <strong>Public View:</strong> Matches &amp; results are read-only. Log in as organizer admin to enter or update scores.
             </span>
           </div>
           <button

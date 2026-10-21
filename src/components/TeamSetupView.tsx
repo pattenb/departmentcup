@@ -104,7 +104,7 @@ export const TeamSetupView: React.FC = () => {
           <div className="flex items-center gap-2.5 text-slate-700">
             <Lock className="w-4 h-4 text-[#1E64C8] shrink-0" />
             <span>
-              Team and roster customization is locked for general viewers. Log in as organizer admin (<strong>admincup</strong>) to edit rosters.
+              Team and roster customization is locked for general viewers. Log in as organizer admin to edit rosters.
             </span>
           </div>
           <button
