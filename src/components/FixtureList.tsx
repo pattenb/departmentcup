@@ -438,6 +438,7 @@ export const FixtureList: React.FC<FixtureListProps> = ({ sport, matches, pouleO
                         <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-end gap-2">
                           {match.completed && (
                             <button
+                              type="button"
                               onClick={() => handleClear(match)}
                               title="Clear match score"
                               className="px-2.5 py-1 text-[11px] text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded transition-colors inline-flex items-center gap-1 cursor-pointer"
@@ -446,6 +447,7 @@ export const FixtureList: React.FC<FixtureListProps> = ({ sport, matches, pouleO
                             </button>
                           )}
                           <button
+                            type="button"
                             onClick={() => {
                               if (!isAdmin) {
                                 openLoginModal('Admin login required to enter match scores.');
@@ -453,12 +455,11 @@ export const FixtureList: React.FC<FixtureListProps> = ({ sport, matches, pouleO
                                 handleSaveMatch(match);
                               }
                             }}
-                            disabled={isAdmin && (homeVal === '' || awayVal === '')}
                             className={`px-3.5 py-1 text-xs font-bold rounded transition-colors inline-flex items-center gap-1 cursor-pointer ${
-                              isDirty || !isAdmin
+                              isDirty || !isAdmin || !match.completed
                                 ? 'bg-[#1E64C8] hover:bg-[#154fa1] text-white shadow-xs'
                                 : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                            } disabled:opacity-40 disabled:cursor-not-allowed`}
+                            }`}
                           >
                             {!isAdmin ? <Lock className="w-3 h-3" /> : <Check className="w-3.5 h-3.5" />}
                             {!isAdmin ? 'Enter Score (Admin)' : match.completed ? 'Update Score' : 'Save Score'}
