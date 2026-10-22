@@ -159,9 +159,9 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const saved = localStorage.getItem(`${STORAGE_KEY}_darts`);
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Auto-upgrade if saved state contains old placeholder names
+        // Auto-upgrade team list if saved state contains old placeholder names without resetting match scores
         if (parsed.teams && parsed.teams.some((t: any) => t.name === 'Tungsten Trebles')) {
-          return createInitialDartsState();
+          parsed.teams = DEFAULT_DARTS_TEAMS;
         }
         return parsed;
       }
@@ -215,19 +215,24 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
           const data = docSnap.data();
           if (data.teams && data.groupMatches && data.knockoutMatches) {
             let teams = data.teams;
+            let needsUpdate = false;
 
-            // Auto-upgrade if Firestore still has legacy placeholder team
+            // Auto-upgrade team roster if Firestore still has legacy placeholder team, WITHOUT resetting matches
             if (teams.some((t: any) => t.name === 'Tungsten Trebles')) {
-              const init = createInitialDartsState();
-              saveDartsStateToFirestore(init);
-              return;
+              teams = DEFAULT_DARTS_TEAMS;
+              needsUpdate = true;
             }
 
             const remoteState: SportTournamentState = {
-              teams: data.teams,
+              teams,
               groupMatches: data.groupMatches,
               knockoutMatches: data.knockoutMatches,
             };
+
+            if (needsUpdate) {
+              saveDartsStateToFirestore(remoteState);
+            }
+
             setDartsState((prev) => {
               if (JSON.stringify(prev) !== JSON.stringify(remoteState)) {
                 return remoteState;
