@@ -335,7 +335,7 @@ export const SportDashboard: React.FC = () => {
                 pouleId="G1"
               />
               <StandingsTable
-                title="Group 2 (7 Teams)"
+                title="Group 2 (5 Teams)"
                 rows={dartsStandingsG2}
                 sport="darts"
                 pouleId="G2"
