@@ -300,7 +300,7 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return calculateStandings(dartsState.teams, dartsState.groupMatches, 'G2', 'darts');
   }, [dartsState.teams, dartsState.groupMatches]);
 
-  // Synchronize Knockout Brackets whenever standings change
+  // Synchronize Knockout Brackets whenever standings change (local state only, no unprompted DB writes)
   useEffect(() => {
     setFoosballState((prev) => {
       const updatedKnockout = syncFoosballKnockout(
@@ -311,9 +311,7 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         foosballBestThird.qualifiedThirds
       );
       if (JSON.stringify(updatedKnockout) !== JSON.stringify(prev.knockoutMatches)) {
-        const nextState = { ...prev, knockoutMatches: updatedKnockout };
-        saveFoosballStateToFirestore(nextState);
-        return nextState;
+        return { ...prev, knockoutMatches: updatedKnockout };
       }
       return prev;
     });
@@ -327,9 +325,7 @@ export const TournamentProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         dartsStandingsG2
       );
       if (JSON.stringify(updatedKnockout) !== JSON.stringify(prev.knockoutMatches)) {
-        const nextState = { ...prev, knockoutMatches: updatedKnockout };
-        saveDartsStateToFirestore(nextState);
-        return nextState;
+        return { ...prev, knockoutMatches: updatedKnockout };
       }
       return prev;
     });
